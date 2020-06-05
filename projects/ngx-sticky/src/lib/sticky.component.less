@@ -1,0 +1,18 @@
+
+
+.ngx-sticky {
+  &__inner {
+    position: relative;
+    width: 100%;
+  }
+
+  &--native {
+    position: sticky;
+  }
+
+  &--simulate {
+    .ngx-sticky__inner {
+      position: fixed;
+    }
+  }
+}

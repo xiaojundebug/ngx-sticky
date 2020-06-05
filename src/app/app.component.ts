@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 
 @Component({
   selector: 'app-root',
@@ -6,5 +6,15 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent {
-  title = 'ngx-sticky-app';
+  title = 'ngx-sticky-app'
+
+  getNumbers(length) {
+    const ret = []
+
+    for (let i = 0; i < length; i++) {
+      ret.push(i)
+    }
+
+    return ret
+  }
 }

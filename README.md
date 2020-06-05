@@ -1,27 +1,52 @@
-# NgxStickyApp
+# NgxSticky
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.26.
+An angular sticky component.
 
-## Development server
+_development environment: angular 8.2.14_
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+<p align="center">
+  <img alt="travis" src="https://travis-ci.org/xiaojun1994/ngx-sticky.svg?branch=master">
+</p>
 
-## Code scaffolding
+👉 [Demo](https://stackblitz.com/edit/ngx-sticky-demo)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Install
 
-## Build
+```bash
+npm i @ciri/ngx-sticky
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+## Quick Start
 
-## Running unit tests
+Add it to your module:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```typescript
+import { StickyModule } from '@ciri/ngx-sticky'
 
-## Running end-to-end tests
+@NgModule({
+  // ...
+  imports: [
+    // ...
+    StickyModule
+  ],
+})
+```
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Add to view:
 
-## Further help
+```html
+<ngx-sticky [offsetTop]="0">hello world</ngx-sticky>
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## Inputs
+
+| Name      | Type   | Default | Description         |
+| --------- | ------ | ------- | ------------------- |
+| offsetTop | number | 0       | Offset top          |
+| zIndex    | number | 1       | z-index when sticky |
+
+## Outputs
+
+| Event  | Description                 | Return value |
+| ------ | --------------------------- | ------------ |
+| change | Triggered when state change | state        |
