@@ -39,7 +39,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs_internal_scheduler_animationFrame__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/internal/scheduler/animationFrame */ "./node_modules/rxjs/internal/scheduler/animationFrame.js");
 /* harmony import */ var rxjs_internal_scheduler_animationFrame__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(rxjs_internal_scheduler_animationFrame__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm2015/operators/index.js");
-/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/fesm2015/common.js");
+/* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/platform-browser */ "./node_modules/@angular/platform-browser/fesm2015/platform-browser.js");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/fesm2015/common.js");
+
 
 
 
@@ -51,6 +53,7 @@ __webpack_require__.r(__webpack_exports__);
  * Generated from: lib/utils.ts
  * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+// 也可以使用 CSS.supports(xxx)
 /**
  * @param {?} property
  * @param {?} value
@@ -83,12 +86,16 @@ function caniuse(property, value, noPrefixes = false) {
 const IS_NATIVE_SUPPORTED = caniuse('position', 'sticky');
 class StickyComponent {
     /**
+     * @param {?} elRef
      * @param {?} cdr
      * @param {?} render
+     * @param {?} sanitizer
      */
-    constructor(cdr, render) {
+    constructor(elRef, cdr, render, sanitizer) {
+        this.elRef = elRef;
         this.cdr = cdr;
         this.render = render;
+        this.sanitizer = sanitizer;
         /**
          * 顶部触发距离
          */
@@ -107,20 +114,36 @@ class StickyComponent {
     /**
      * @return {?}
      */
-    get outerClassList() {
-        return {
+    get hostClassName() {
+        /** @type {?} */
+        const obj = {
             'ngx-sticky': true,
             'ngx-sticky--native': IS_NATIVE_SUPPORTED,
             'ngx-sticky--simulate': !IS_NATIVE_SUPPORTED && this.fixed
         };
+        return Object.entries(obj)
+            .filter((/**
+         * @param {?} el
+         * @return {?}
+         */
+        el => el[1]))
+            .map((/**
+         * @param {?} el
+         * @return {?}
+         */
+        el => el[0]))
+            .join(' ');
     }
     /**
      * @return {?}
      */
-    get outerStyle() {
+    get hostStyle() {
         if (!IS_NATIVE_SUPPORTED)
             return;
-        return { top: this.offsetTop + 'px', zIndex: this.zIndex };
+        return this.sanitizer.bypassSecurityTrustStyle(`
+      top: ${this.offsetTop}px;
+      z-index: ${this.zIndex};
+    `);
     }
     /**
      * @return {?}
@@ -151,7 +174,7 @@ class StickyComponent {
          */
         () => {
             /** @type {?} */
-            const outer = this.outer.nativeElement;
+            const outer = this.elRef.nativeElement;
             /** @type {?} */
             const rect = outer.getBoundingClientRect();
             if (!this.fixed && rect.top <= this.offsetTop) {
@@ -178,22 +201,24 @@ class StickyComponent {
 StickyComponent.decorators = [
     { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"], args: [{
                 selector: 'ngx-sticky',
-                template: "<div #outer [ngClass]=\"outerClassList\" [ngStyle]=\"outerStyle\">\n  <div #inner class=\"ngx-sticky__inner\" [ngStyle]=\"innerStyle\">\n    <ng-content></ng-content>\n  </div>\n</div>\n",
+                template: "<div class=\"ngx-sticky__inner\" [ngStyle]=\"innerStyle\">\n  <ng-content></ng-content>\n</div>\n",
                 changeDetection: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ChangeDetectionStrategy"].OnPush,
-                styles: [".ngx-sticky__inner{position:relative;width:100%}.ngx-sticky--native{position:-webkit-sticky;position:sticky}.ngx-sticky--simulate .ngx-sticky__inner{position:fixed}"]
+                styles: [":host ::ng-deep{display:block}:host ::ng-deep .ngx-sticky__inner{position:relative;width:100%}:host(.ngx-sticky--native) ::ng-deep{position:-webkit-sticky;position:sticky}:host(.ngx-sticky--simulate) ::ng-deep .ngx-sticky__inner{position:fixed}"]
             }] }
 ];
 /** @nocollapse */
 StickyComponent.ctorParameters = () => [
+    { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ElementRef"] },
     { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ChangeDetectorRef"] },
-    { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Renderer2"] }
+    { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Renderer2"] },
+    { type: _angular_platform_browser__WEBPACK_IMPORTED_MODULE_4__["DomSanitizer"] }
 ];
 StickyComponent.propDecorators = {
-    outer: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"], args: ['outer', { static: false },] }],
-    inner: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"], args: ['inner', { static: false },] }],
     offsetTop: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"], args: ['offsetTop',] }],
     zIndex: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"], args: ['zIndex',] }],
-    change: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"], args: ['change',] }]
+    change: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"], args: ['change',] }],
+    hostClassName: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["HostBinding"], args: ['class',] }],
+    hostStyle: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["HostBinding"], args: ['style',] }]
 };
 if (false) {}
 
@@ -207,7 +232,7 @@ class StickyModule {
 StickyModule.decorators = [
     { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"], args: [{
                 declarations: [StickyComponent],
-                imports: [_angular_common__WEBPACK_IMPORTED_MODULE_4__["CommonModule"]],
+                imports: [_angular_common__WEBPACK_IMPORTED_MODULE_5__["CommonModule"]],
                 exports: [StickyComponent]
             },] }
 ];

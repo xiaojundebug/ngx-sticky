@@ -91,7 +91,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     /* harmony import */
 
 
-    var _angular_common__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(
+    var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(
+    /*! @angular/platform-browser */
+    "./node_modules/@angular/platform-browser/fesm2015/platform-browser.js");
+    /* harmony import */
+
+
+    var _angular_common__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(
     /*! @angular/common */
     "./node_modules/@angular/common/fesm2015/common.js");
     /**
@@ -99,6 +105,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
      * Generated from: lib/utils.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    // 也可以使用 CSS.supports(xxx)
 
     /**
      * @param {?} property
@@ -141,14 +148,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     var StickyComponent = /*#__PURE__*/function () {
       /**
+       * @param {?} elRef
        * @param {?} cdr
        * @param {?} render
+       * @param {?} sanitizer
        */
-      function StickyComponent(cdr, render) {
+      function StickyComponent(elRef, cdr, render, sanitizer) {
         _classCallCheck(this, StickyComponent);
 
+        this.elRef = elRef;
         this.cdr = cdr;
         this.render = render;
+        this.sanitizer = sanitizer;
         /**
          * 顶部触发距离
          */
@@ -197,7 +208,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           */
           function () {
             /** @type {?} */
-            var outer = _this.outer.nativeElement;
+            var outer = _this.elRef.nativeElement;
             /** @type {?} */
 
             var rect = outer.getBoundingClientRect();
@@ -230,26 +241,39 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           this.destroy$.complete();
         }
       }, {
-        key: "outerClassList",
+        key: "hostClassName",
         get: function get() {
-          return {
+          /** @type {?} */
+          var obj = {
             'ngx-sticky': true,
             'ngx-sticky--native': IS_NATIVE_SUPPORTED,
             'ngx-sticky--simulate': !IS_NATIVE_SUPPORTED && this.fixed
           };
+          return Object.entries(obj).filter(
+          /**
+          * @param {?} el
+          * @return {?}
+          */
+          function (el) {
+            return el[1];
+          }).map(
+          /**
+          * @param {?} el
+          * @return {?}
+          */
+          function (el) {
+            return el[0];
+          }).join(' ');
         }
         /**
          * @return {?}
          */
 
       }, {
-        key: "outerStyle",
+        key: "hostStyle",
         get: function get() {
           if (!IS_NATIVE_SUPPORTED) return;
-          return {
-            top: this.offsetTop + 'px',
-            zIndex: this.zIndex
-          };
+          return this.sanitizer.bypassSecurityTrustStyle("\n      top: ".concat(this.offsetTop, "px;\n      z-index: ").concat(this.zIndex, ";\n    "));
         }
         /**
          * @return {?}
@@ -273,34 +297,26 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
       args: [{
         selector: 'ngx-sticky',
-        template: "<div #outer [ngClass]=\"outerClassList\" [ngStyle]=\"outerStyle\">\n  <div #inner class=\"ngx-sticky__inner\" [ngStyle]=\"innerStyle\">\n    <ng-content></ng-content>\n  </div>\n</div>\n",
+        template: "<div class=\"ngx-sticky__inner\" [ngStyle]=\"innerStyle\">\n  <ng-content></ng-content>\n</div>\n",
         changeDetection: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ChangeDetectionStrategy"].OnPush,
-        styles: [".ngx-sticky__inner{position:relative;width:100%}.ngx-sticky--native{position:-webkit-sticky;position:sticky}.ngx-sticky--simulate .ngx-sticky__inner{position:fixed}"]
+        styles: [":host ::ng-deep{display:block}:host ::ng-deep .ngx-sticky__inner{position:relative;width:100%}:host(.ngx-sticky--native) ::ng-deep{position:-webkit-sticky;position:sticky}:host(.ngx-sticky--simulate) ::ng-deep .ngx-sticky__inner{position:fixed}"]
       }]
     }];
     /** @nocollapse */
 
     StickyComponent.ctorParameters = function () {
       return [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ElementRef"]
+      }, {
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ChangeDetectorRef"]
       }, {
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Renderer2"]
+      }, {
+        type: _angular_platform_browser__WEBPACK_IMPORTED_MODULE_4__["DomSanitizer"]
       }];
     };
 
     StickyComponent.propDecorators = {
-      outer: [{
-        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"],
-        args: ['outer', {
-          "static": false
-        }]
-      }],
-      inner: [{
-        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"],
-        args: ['inner', {
-          "static": false
-        }]
-      }],
       offsetTop: [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"],
         args: ['offsetTop']
@@ -312,6 +328,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       change: [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"],
         args: ['change']
+      }],
+      hostClassName: [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["HostBinding"],
+        args: ['class']
+      }],
+      hostStyle: [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["HostBinding"],
+        args: ['style']
       }]
     };
 
@@ -331,7 +355,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"],
       args: [{
         declarations: [StickyComponent],
-        imports: [_angular_common__WEBPACK_IMPORTED_MODULE_4__["CommonModule"]],
+        imports: [_angular_common__WEBPACK_IMPORTED_MODULE_5__["CommonModule"]],
         exports: [StickyComponent]
       }]
     }];
