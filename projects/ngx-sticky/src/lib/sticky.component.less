@@ -1,18 +1,19 @@
+:host ::ng-deep {
+  display: block;
 
-
-.ngx-sticky {
-  &__inner {
+  .ngx-sticky__inner {
     position: relative;
     width: 100%;
   }
+}
 
-  &--native {
-    position: sticky;
-  }
+:host(.ngx-sticky--native) ::ng-deep {
+  position: sticky;
+}
 
-  &--simulate {
-    .ngx-sticky__inner {
-      position: fixed;
-    }
+:host(.ngx-sticky--simulate) ::ng-deep {
+  .ngx-sticky__inner {
+    position: fixed;
   }
 }
+

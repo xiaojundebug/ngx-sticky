@@ -2,18 +2,20 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
+  HostBinding,
   Input,
   OnDestroy,
   OnInit,
   Output,
-  Renderer2,
-  ViewChild
+  Renderer2
 } from '@angular/core'
 import { caniuse } from './utils'
 import { combineLatest, fromEvent, Subject } from 'rxjs'
 import { animationFrame } from 'rxjs/internal/scheduler/animationFrame'
 import { startWith, takeUntil, throttleTime } from 'rxjs/operators'
+import { DomSanitizer } from '@angular/platform-browser'
 
 const IS_NATIVE_SUPPORTED = caniuse('position', 'sticky')
 
@@ -24,8 +26,6 @@ const IS_NATIVE_SUPPORTED = caniuse('position', 'sticky')
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StickyComponent implements OnInit, OnDestroy {
-  @ViewChild('outer', { static: false }) outer
-  @ViewChild('inner', { static: false }) inner
   /** 顶部触发距离 */
   @Input('offsetTop') offsetTop = 0
   /** 同 css z-index */
@@ -33,16 +33,27 @@ export class StickyComponent implements OnInit, OnDestroy {
   /** 状态变动时触发 */
   @Output('change') change = new EventEmitter<boolean>()
 
-  get outerClassList() {
-    return {
+  @HostBinding('class')
+  get hostClassName() {
+    const obj = {
       'ngx-sticky': true,
       'ngx-sticky--native': IS_NATIVE_SUPPORTED,
       'ngx-sticky--simulate': !IS_NATIVE_SUPPORTED && this.fixed
     }
+
+    return Object.entries(obj)
+      .filter(el => el[1])
+      .map(el => el[0])
+      .join(' ')
   }
-  get outerStyle() {
+
+  @HostBinding('style')
+  get hostStyle() {
     if (!IS_NATIVE_SUPPORTED) return
-    return { top: this.offsetTop + 'px', zIndex: this.zIndex }
+    return this.sanitizer.bypassSecurityTrustStyle(`
+      top: ${this.offsetTop}px;
+      z-index: ${this.zIndex};
+    `)
   }
   get innerStyle() {
     if (IS_NATIVE_SUPPORTED) return
@@ -55,7 +66,12 @@ export class StickyComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>()
   private fixed = false
 
-  constructor(private cdr: ChangeDetectorRef, private render: Renderer2) {}
+  constructor(
+    private elRef: ElementRef,
+    private cdr: ChangeDetectorRef,
+    private render: Renderer2,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit() {
     if (IS_NATIVE_SUPPORTED) {
@@ -70,7 +86,7 @@ export class StickyComponent implements OnInit, OnDestroy {
     combineLatest(resize$, scroll$)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        const outer = this.outer.nativeElement
+        const outer = this.elRef.nativeElement
         const rect = outer.getBoundingClientRect()
 
         if (!this.fixed && rect.top <= this.offsetTop) {

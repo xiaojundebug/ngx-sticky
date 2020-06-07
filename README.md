@@ -40,10 +40,10 @@ Add to view:
 
 ## Inputs
 
-| Name      | Type   | Default | Description         |
-| --------- | ------ | ------- | ------------------- |
-| offsetTop | number | 0       | Offset top          |
-| zIndex    | number | 1       | z-index when sticky |
+| Name      | Type   | Default | Description               |
+| --------- | ------ | ------- | ------------------------- |
+| offsetTop | number | 0       | Offset top                |
+| zIndex    | number | 1       | Equivalent to css z-index |
 
 ## Outputs
 

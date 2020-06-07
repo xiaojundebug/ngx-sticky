@@ -1,3 +1,4 @@
+// 也可以使用 CSS.supports(xxx)
 function caniuse(property, value, noPrefixes = false) {
   const prop = property + ':'
   const el = document.createElement('test')
